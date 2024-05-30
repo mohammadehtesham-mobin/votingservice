@@ -39,7 +39,7 @@ public class VotingServicesImpl implements VotingServices{
         List<Vote> voteList = voteRepo.findAll();
         VotingStatus voteStatus =  new VotingStatus();
         for(Vote vote:voteList) {
-            switch (vote.getId()){
+            switch (vote.getId()) {
                 case AWS -> voteStatus.setAws(vote.getCount());
                 case GCP -> voteStatus.setGcp(vote.getCount());
                 case OC -> voteStatus.setOc(vote.getCount());
