@@ -44,6 +44,7 @@ public class VotingServicesImpl implements VotingServices{
                 case GCP -> voteStatus.setGcp(vote.getCount());
                 case OC -> voteStatus.setOc(vote.getCount());
                 case AZURE -> voteStatus.setAzure(vote.getCount());
+                case IBM -> voteStatus.setIbm(vote.getCount());
             }
         }
         return voteStatus;

@@ -8,4 +8,5 @@ public class VotingStatus {
     private int gcp;
     private int azure;
     private int oc;
+    private int ibm;
 }
