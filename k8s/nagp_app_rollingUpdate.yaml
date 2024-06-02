@@ -21,19 +21,31 @@ spec:
         app: nagp-voting-app
     spec:
       containers:
-      - name: nagp-voting-app
-        image: mohammadehtesham/nagp-voting:1.0.1
-        ports:
-        - containerPort: 8080
-        envFrom:
-         - secretRef:
-            name: nagp-voting-app-secret
-         - configMapRef:
-            name: nagp-voting-app-config
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+        - name: nagp-voting-app
+          image: mohammadehtesham/nagp-voting:1.0.1
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: nagp-voting-app-secret
+            - configMapRef:
+                name: nagp-voting-app-config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 150
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 150
+            periodSeconds: 10
