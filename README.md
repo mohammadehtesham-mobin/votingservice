@@ -33,5 +33,5 @@ This project is a simple web application that allows users to vote for their fav
   https://hub.docker.com/r/mohammadehtesham/nagp-voting
   pull Image:
   docker pull mohammadehtesham/nagp-voting
-3. in k8s folder all the deployment files are available. only prequesties is mounted disk which can be creatred as below in GCP
+3. Inside k8s folder all the k8s yaml files are available. only prequesties is mounted disk which can be creatred as below in GCP or can be changed to someting else.
   e.g: gcloud compute disks create --size=10GB --zone=us-central1-a nagp-mysql-disk  
