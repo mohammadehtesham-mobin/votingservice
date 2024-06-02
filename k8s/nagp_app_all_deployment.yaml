@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nagp
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: nagp-mysql-pv
+ namespace: nagp
+ labels:
+  name: nagp-mysql-pv
+spec:
+ accessModes: ["ReadWriteOnce" ]
+ capacity:
+  storage: 5Gi
+ persistentVolumeReclaimPolicy: Retain
+ gcePersistentDisk:
+  pdName: nagp-mysql-disk
+  fsType: ext4 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nagp-mysql-pvc
+  namespace: nagp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nagp-mysql-secret
+  namespace: nagp
+type: Opaque
+data:
+ MYSQL_ROOT_PASSWORD: bmFncDEyMzQ=
+ MYSQL_DATABASE: dm90aW5nZGI=
+ MYSQL_USER: YWRtaW4=
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nagp-mysql
+  namespace: nagp
+spec:
+ clusterIP: None
+ selector:
+   app: nagp-mysql
+ ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nagp-mysql
+  namespace: nagp
+spec:
+  replicas: 1
+  serviceName: nagp-mysql
+  selector:
+    matchLabels:
+      app: nagp-mysql
+  template:
+    metadata:
+      labels:
+        app: nagp-mysql
+    spec:
+      volumes:
+       - name: mysql-vol
+         persistentVolumeClaim:
+          claimName: nagp-mysql-pvc
+      containers:
+      - name: nagp-mysql
+        image:  mysql:8.0.33
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+         - name: mysql-vol
+           mountPath: /var/lib/mysql
+           subPath: dbdata 
+        envFrom:
+         - secretRef:
+            name: nagp-mysql-secret   
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nagp-voting-app-secret
+  namespace: nagp
+type: Opaque  
+data:
+ DB_USER: cm9vdA==
+ DB_PASS: bmFncDEyMzQ=
+ DB_URL: amRiYzpteXNxbDovL25hZ3AtbXlzcWw6MzMwNi92b3RpbmdkYg==
+ DB_DRIVER: Y29tLm15c3FsLmNqLmpkYmMuRHJpdmVy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: nagp-voting-app-config
+ namespace: nagp
+data:
+ THYMELEAF_PREFIX: classpath:/templates/
+ THYMELEAF_SUFFIX: .html
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nagp-voting-app
+  namespace: nagp
+  labels:
+    app: nagp-voting-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nagp-voting-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: nagp-voting-app
+    spec:
+      containers:
+      - name: nagp-voting-app
+        image: mohammadehtesham/nagp-voting:1.0.0
+        ports:
+        - containerPort: 8080
+        envFrom:
+         - secretRef:
+            name: nagp-voting-app-secret
+         - configMapRef:
+            name: nagp-voting-app-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/livenessState
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readinessState
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10        
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nagp-voting-app
+  namespace: nagp
+spec:
+  type: NodePort
+  selector:
+    app: nagp-voting-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30001               

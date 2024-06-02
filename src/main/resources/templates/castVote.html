@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Vote for Cloud Platform</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .vote-container {
+            width: 80%;
+            display: flex;
+            justify-content: center; /* Center align items */
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px; /* Adjust the gap between boxes */
+        }
+        .vote-box {
+            width: 100px; /* Adjust the width as needed */
+            height: 100px; /* Adjust the height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .aws { background-color: #ff9900; }
+        .gcp { background-color: #4285F4; }
+        .azure { background-color: #0072C6; }
+        .oc { background-color: #FF0000; }
+        .ibm { background-color: #00AEEF; }
+        .message-box {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 200px;
+            max-width: 80%;
+        }
+        .message-box.error {
+            background-color: red;
+        }
+        .message-box button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+  <script>
+        function submitVote(platform) {
+            fetch('/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ votingParticipants: platform })
+            }).then(response => {
+                if (response.ok) {
+                    showMessage('Vote casted successfully!', false);
+                } else {
+                    showMessage('Failed to cast vote.', true);
+                }
+            });
+        }
+
+        function showMessage(message, isError) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.className = 'message-box' + (isError ? ' error' : '');
+            messageBox.querySelector('span').innerText = message;
+            messageBox.style.display = 'flex';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</head>
+<body>
+<div class="header">Vote for Cloud Platform</div>
+<div class="vote-container">
+  <div class="vote-box aws" onclick="submitVote('AWS')">AWS</div>
+  <div class="vote-box gcp" onclick="submitVote('GCP')">GCP</div>
+  <div class="vote-box azure" onclick="submitVote('AZURE')">Azure</div>
+  <div class="vote-box oc" onclick="submitVote('OC')">OC</div>
+</div>
+<div id="message-box" class="message-box" style="display: none;">
+  <span></span>
+  <button onclick="document.getElementById('message-box').style.display='none';">&times;</button>
+</div>
+</body>
+</html>

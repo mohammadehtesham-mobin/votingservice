@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cloud Platform Voting Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .chart-container {
+            width: 80%;
+            display: flex;
+            justify-content: center; /* Center align items */
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px; /* Adjust the gap between boxes */
+        }
+        .bar {
+            width: 100px; /* Adjust the width as needed */
+            height: 100px; /* Adjust the height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+        .aws { background-color: #ff9900; }
+        .gcp { background-color: #4285F4; }
+        .azure { background-color: #0072C6; }
+        .oc { background-color: #FF0000; }
+        .ibm { background-color: #00AEEF; }
+    </style>
+</head>
+<body>
+<div class="header">Cloud Platform Voting Result</div>
+<div class="chart-container">
+    <div class="bar aws" th:text="'AWS: ' + ${data.aws}"></div>
+    <div class="bar gcp" th:text="'GCP: ' + ${data.gcp}"></div>
+    <div class="bar azure" th:text="'Azure: ' + ${data.azure}"></div>
+    <div class="bar oc" th:text="'OC: ' + ${data.oc}"></div>
+</div>
+</body>
+</html>
